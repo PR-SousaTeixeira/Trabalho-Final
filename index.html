@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game-Trabalho Final</title>
+    <style>
+        body {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow',sans-serif;
+            background-color: peru;
+            text-align: center;
+        }
+
+        #pagina-inicial {
+            max-width: 800px;
+            margin: 250px auto;
+            background-color: burlywood;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: black;
+        }
+
+        #texto-inicial {
+            margin-bottom: 20px;
+            font-size: 23px;
+            color: white;
+        }
+
+        #botao-inicial {
+            padding: 10px 20px;
+            background-color: cadetblue;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #botao-inicial:hover {
+            background-color: blue;
+        }
+
+        #quiz-container {
+            display: none;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0 , 0, 0, 0.1);
+        }
+
+        #perguntas-container {
+            margin-bottom: 20px;
+        }
+
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 10px;
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .option:hover {
+            background-color: #ccc;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #next-btn {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #next-btn:hover {
+            background-color: #45a049;
+        }
+
+        .status-gif {
+            display: none;
+            max-width: 100%;
+        }
+
+        #playing-gif {
+            display: none;
+            max-width: 100%;
+        }
+
+        #answer-audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="pagina-inicial">
+        <h2>Bem vindo ao jogo mais moderno de 1624</h2>
+        <p id="texto-inicial">faz te Dj da aldeia e adivinha a muisca pelo seu remix medieval</p>
+        <button id="botao-inicial" onclick="startQuiz()">Começar</button>
+    </div>
+
+    <div id="quiz-container">
+        <h2>Quiz Game</h2>
+        <div id="perguntas-container">
+            <audio controls id="question-audio" onplay="onAudioPlay()"></audio>
+        </div>
+        <div id="options"></div>
+        <div id="result"></div>
+        <button id="next-btn" onclick="nextQuestion()">Next</button>
+        <audio id="answer-audio" controls></audio>
+        <img id="correct-gif" class="status-gif" src="https://tenor.com/pt-PT/view/funnyuserperiod-medieval-dance-spell-curse-gif-19328518" alt="Correct GIF">
+        <img id="wrong-gif" class="status-gif" src="https://media.tenor.com/YhRuSLHzeGYAAAAM/knight-dancing.gif" alt="Wrong GIF">
+        <img id="playing-gif" class="status-gif" src="https://media.tenor.com/YhRuSLHzeGYAAAAM/knight-dancing.gif" alt="Playing GIF">
+    </div>
+
+    <script>
+        const startPage = document.getElementById("pagina-inicial");
+        const quizContainer = document.getElementById("quiz-container");
+
+        function startQuiz() {
+            startPage.style.display = "none";
+            quizContainer.style.display = "block";
+            loadQuestion();
+        }
+
+        const questions = [
+            {
+                audioSrc:"https://github.com/PR-SousaTeixeira/audioMp3/raw/main/Hips%20dont%20lie%20Medieval.mp3",
+                options: ["Shakira-Hips dont lie", "Ed Sheeran-Shape of You", "Post Malone - Sunflower", "Luis Fonsi-Despacito"],
+                correctAnswer: "Shakira-Hips dont lie",
+                answerAudioSrc:"https://github.com/PR-SousaTeixeira/audioMp3/raw/main/Hips%20dont%20lie%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Blinding%20lights%20Medieval.mp3",
+                options: ["Lewis Capaldi -Someone You Loved", "Juice WRLD Lucid Dreams", "Drake - Gods Plan", "The Weeknd - Blinding Lights"],
+                correctAnswer: "The Weeknd - Blinding Lights",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Blinding%20lights%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Blue%20Medieval.mp3",
+                options: ["Tones And I - Dance Monkey", "Drake - One Dance", "Ed Sheeran - Perfect", "Eiffel 65-Blue"],
+                correctAnswer: "Eiffel 65-Blue",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Blue%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Californication%20Medieval.mp3",
+                options: ["Red Hot Chili peppers-Californication", "Post Malone - rockstar", "Imagine Dragons - Believer", "Hozier - Take Me to Church"],
+                correctAnswer: "Red Hot Chili peppers-Californication",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Californication%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Candy%20Shop%20Medieval.mp3",
+                options: ["XXXTENTACION - SAD!", "50 Cent-Candy Shop", "The Weeknd - Starboy", "J. Cole - No Role Modelz"],
+                correctAnswer: "50 Cent-Candy Shop",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Candy%20Shop%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Bound%202%20Medieval.mp3",
+                options: ["Kanye West-Bound 2", "Lil Nas X - INDUSTRY BABY", "SAINt JHN - Roses", "Bad Bunny - DÁKITI"],
+                correctAnswer: "Kanye West-Bound 2",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Bound%202%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Careless%20Whisper%20Medieval.mp3",
+                options: ["Bruno Mars - Uptown Funk", "Shawn Mendes - There's Nothing Holdin' Me Back", "Oasis - Wonderwall", " George Michael-Careless Whisper"],
+                correctAnswer: " George Michael-Careless Whisper",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Careless%20whisper%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Counting%20Stars%20Medieval.mp3",
+                options: ["The Chainsmokers - Closer", "The Killers - Mr. Brightside", "OneRepublic - Counting Stars", "Queen - Bohemian Rhapsody"],
+                correctAnswer: "OneRepublic - Counting Stars",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Counting%20stars%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/GTA%20san%20andreas%20Medieval.mp3",
+                options: ["Post Malone - Congratulations", "Eminem - Till I Collapse", "GTA San Andreas theme", "BTS - Dynamite"],
+                correctAnswer: "GTA San Andreas theme",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/GTA%20san%20andreas%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Hotline%20Bling%20Medieval.mp3",
+                options: ["Drake-Hotline Bling", "Billie Eilish - bad guy", "Harry Styles - Watermelon Sugar", "The Chainsmokers - Closer"],
+                correctAnswer: "Drake-Hotline Bling",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Hotline%20bling%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Poker%20Face%20Medieval.mp3",
+                options: ["The Weeknd - Die For You", "Lady Gaga-Poker Face", "Ariana Grande - 7 rings", "Olivia Rodrigo - good 4 u"],
+                correctAnswer: "Lady Gaga-Poker Face",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Poker%20face%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/I%20want%20it%20that%20way%20Medieval.mp3",
+                options: ["Queen - Don't Stop Me Now", "Elton John - Cold Heart", "BackstreetBoys-I want it that way", "Mariah Carey - All I Want for Christmas Is You"],
+                correctAnswer: "BackstreetBoys-I want it that way",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/I%20want%20it%20that%20way%20original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Smooth%20Criminal%20Medieval.mp3",
+                options: ["Tom Odell - Another Love", "Lady Gaga - Shallow", "Lukas Graham - 7 Years", "Michael Jackson-Smooth Criminal"],
+                correctAnswer: "Michael Jackson-Smooth Criminal",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Smooth%20Criminal%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Yeah!%20Medieval.mp3",
+                options: ["DJ Snake - Let Me Love You", "Usher-Yeah!", "Eminem - Without Me", "French Montana - Unforgettable"],
+                correctAnswer: "Usher-Yeah!",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Yeah!%20Original.mp3"
+            },
+            {
+                audioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Gangstas%20Paradise%20Medieval.mp3",
+                options: ["Eminem - Till I Collapse", "Justin Bieber - Love Yourself", "Coolio-Gangstas Paradise", "SirKazzio-Estou Gordito"],
+                correctAnswer: "Coolio-Gangstas Paradise",
+                answerAudioSrc: "https://github.com/PR-SousaTeixeira/audioMp3/raw/main/audios%20Final/Gangtas%20paradise%20original.mp3"
+            },
+            //perguntas
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const questionContainer = document.getElementById("perguntas-container");
+            const optionsContainer = document.getElementById("options");
+            const resultElement = document.getElementById("result");
+            const answerAudio = document.getElementById("answer-audio");
+
+            // reset a pergunta e esconder o gif
+            questionContainer.innerHTML = '<audio controls autoplay id="question-audio" onplay="onAudioPlay()"></audio>';
+            document.querySelectorAll('.status-gif').forEach(gif => gif.style.display = 'none');
+
+
+            const questionAudio = document.getElementById("question-audio");
+            questionAudio.src = currentQuestion.audioSrc;
+            questionAudio.load();
+
+            // operece as opcções, USA JSX
+            optionsContainer.innerHTML = currentQuestion.options.map((option, index) => {
+                return `<div class="option" onclick="checkAnswer('${option}', ${index})">${option}</div>`;
+            }).join('');
+
+        }
+
+        function checkAnswer(selectedAnswer, index) {
+    const currentQuestion = questions[currentQuestionIndex];
+    const resultElement = document.getElementById("result");
+    const nextBtn = document.getElementById("next-btn");
+    const correctGif = document.getElementById("correct-gif");
+    const wrongGif = document.getElementById("wrong-gif");
+    const answerAudio = document.getElementById("answer-audio");
+    const questionAudio = document.getElementById("question-audio");
+
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+        resultElement.textContent = "Correto!";
+        resultElement.style.color = "green";
+        score++;
+
+        // GIF correto
+        correctGif.style.display = "block";
+        wrongGif.style.display = "none"; // hide wrong GIF
+    } else {
+        resultElement.textContent = "Errado :( a opção certa era " + currentQuestion.correctAnswer;
+        resultElement.style.color = "red";
+
+        // wrong GIF
+        wrongGif.style.display = "block";
+        correctGif.style.display = "none"; // hide correct GIF
+    }
+
+    // Audio original show/hide
+    answerAudio.src = currentQuestion.answerAudioSrc;
+    answerAudio.style.display = "block";
+    answerAudio.load();
+    answerAudio.play();
+
+    // Pause and reset the question audio
+    questionAudio.pause();
+    questionAudio.currentTime = 0;
+
+    // Disable the options after selecting an answer
+    nextBtn.disabled = false;
+    document.querySelectorAll(".option")[index].classList.add("selected");
+    document.querySelectorAll(".option").forEach((option, i) => {
+        option.onclick = null;
+    });
+        }
+
+        function nextQuestion() {
+        currentQuestionIndex++;
+        const correctGif = document.getElementById("correct-gif");
+        const wrongGif = document.getElementById("wrong-gif");
+        const answerAudio = document.getElementById("answer-audio");
+        const questionAudio = document.getElementById("question-audio");
+
+        // Pause and reset the audio elements
+        answerAudio.pause();
+        answerAudio.currentTime = 0;
+        questionAudio.pause();
+        questionAudio.currentTime = 0;
+
+        // Hide elements until the next question
+        correctGif.style.display = "none";
+        wrongGif.style.display = "none";
+        answerAudio.style.display = "none";
+
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showFinalScore();
+        }
+
+        }
+        //PERCEBER MELHOR, USA JSX
+        function showFinalScore() {
+            const quizContainer = document.getElementById("quiz-container");
+            quizContainer.innerHTML = `<h2>Your Final Score: ${score} out of ${questions.length}</h2>`;
+        }
+       //AUTOPLAY??????
+        function onAudioPlay() {
+            const playingGif = document.getElementById("playing-gif");
+            playingGif.style.display = "block";
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
